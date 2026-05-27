@@ -87,6 +87,7 @@ const timer = ref(0);
 const isWin = ref(false);
 const lockBoard = ref(true);
 const firstCard = ref(null);
+const gameStarted = ref(false);
 let interval = null;
 
 watch(() => props.manualLevel, (newVal) => {
@@ -113,6 +114,7 @@ const initGame = () => {
   turns.value = 0;
   lockBoard.value = true;
   firstCard.value = null;
+  gameStarted.value = false;
 
   const numPairs = levels[currentLevel.value].pairs;
   const deck = [...emojis.slice(0, numPairs), ...emojis.slice(0, numPairs)]
@@ -124,12 +126,18 @@ const initGame = () => {
   setTimeout(() => {
     cards.value.forEach(c => c.flipped = false);
     lockBoard.value = false;
-    interval = setInterval(() => timer.value++, 1000);
   }, 1200);
 };
 
 const flipCard = (i) => {
   if (lockBoard.value || cards.value[i].flipped || cards.value[i].matched) return;
+
+  // Запуск таймера при першому перевертанні картки гравцем
+  if (!gameStarted.value) {
+    gameStarted.value = true;
+    clearInterval(interval);
+    interval = setInterval(() => timer.value++, 1000);
+  }
 
   const emoji = cards.value[i].value;
   const entityId = emojiToId[emoji] || null;

@@ -426,7 +426,7 @@ body {
 }
 
 .login-modal {
-  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(9, 15, 35, 0.98));
   padding: 52px 44px;
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -438,6 +438,8 @@ body {
     inset 0 1px 0 rgba(255,255,255,0.15);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .login-modal::before {
   content: '';
@@ -457,11 +459,18 @@ body {
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-icon {
-  font-size: 3rem;
+  font-size: 2.8rem;
   filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.6));
   animation: float-soft 4s ease-in-out infinite;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-icon-ring {
   position: absolute;
@@ -679,8 +688,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  min-width: 290px;
-  max-width: 320px;
+  min-width: 340px;
+  max-width: 380px;
   flex-shrink: 0;
   position: sticky;
   top: 20px;

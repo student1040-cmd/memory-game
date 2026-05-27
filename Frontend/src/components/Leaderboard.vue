@@ -18,6 +18,7 @@
           <span v-else class="rank-num">{{ index + 1 }}</span>
         </div>
         <div class="score-name" :title="score.name">{{ score.name }}</div>
+        <span class="lb-level-badge">Lvl {{ score.level || 1 }}</span>
         <div class="score-time">
           <strong>{{ score.time }}</strong><span>с</span>
         </div>
@@ -45,21 +46,56 @@ const fetchScores = () => {
     if (data) {
       const list = Object.keys(data).map(key => ({ id: key, ...data[key] }));
       
-      // Фільтруємо список, залишаючи тільки найкращий (найшвидший) результат для кожного унікального гравця
+      // Фільтруємо список, залишаючи тільки найкращий результат для кожного унікального гравця
       const bestScoresMap = {};
       list.forEach(item => {
         const name = (item.name || "Гість").trim();
+        const level = Number(item.level) || 1;
         const time = Number(item.time) || 999999;
+        const turns = Number(item.turns) || 999999;
         
-        if (!bestScoresMap[name] || time < Number(bestScoresMap[name].time)) {
+        if (!bestScoresMap[name]) {
           bestScoresMap[name] = item;
+        } else {
+          const existing = bestScoresMap[name];
+          const exLevel = Number(existing.level) || 1;
+          const exTime = Number(existing.time) || 999999;
+          const exTurns = Number(existing.turns) || 999999;
+          
+          let isBetter = false;
+          if (level > exLevel) {
+            isBetter = true; // Вищий рівень краще
+          } else if (level === exLevel) {
+            if (time < exTime) {
+              isBetter = true; // Менший час краще
+            } else if (time === exTime && turns < exTurns) {
+              isBetter = true; // Менше ходів краще
+            }
+          }
+          
+          if (isBetter) {
+            bestScoresMap[name] = item;
+          }
         }
       });
       
       const uniqueList = Object.values(bestScoresMap);
       
+      // Сортуємо: вищий рівень спочатку, при рівності — менший час, далі менше ходів
       scores.value = uniqueList
-        .sort((a, b) => Number(a.time) - Number(b.time))
+        .sort((a, b) => {
+          const levelA = Number(a.level) || 1;
+          const levelB = Number(b.level) || 1;
+          if (levelB !== levelA) return levelB - levelA;
+          
+          const timeA = Number(a.time) || 999999;
+          const timeB = Number(b.time) || 999999;
+          if (timeA !== timeB) return timeA - timeB;
+          
+          const turnsA = Number(a.turns) || 999999;
+          const turnsB = Number(b.turns) || 999999;
+          return turnsA - turnsB;
+        })
         .slice(0, 10);
     } else {
       scores.value = [];
@@ -166,7 +202,7 @@ h3 {
 
 .row {
   display: grid;
-  grid-template-columns: 32px 1fr auto 26px;
+  grid-template-columns: 32px 1fr auto auto 26px;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
@@ -282,6 +318,19 @@ h3 {
 @keyframes float-soft {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+
+.lb-level-badge {
+  font-size: 0.65rem;
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  font-weight: 700;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 @media (max-width: 480px) {
