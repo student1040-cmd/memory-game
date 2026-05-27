@@ -1,3 +1,14 @@
+# Игнорируем node_modules везде, где они могут быть
 node_modules/
+Backend/node_modules/
+Frontend/node_modules/
+
+# Игнорируем логи и файлы сборки
+Frontend/dist/
+Frontend/build/
 package-lock.json
+
+# Игнорируем секреты (если они у вас появятся)
 .env
+Backend/.env
+Frontend/.env
